@@ -10,7 +10,7 @@
         {!! Form::text('status') !!}
 
 
-        {!! Form::label('content', 'メッセージ:') !!}
+        {!! Form::label('content', 'タスク:') !!}
         {!! Form::text('content') !!}
 
         {!! Form::submit('更新') !!}
