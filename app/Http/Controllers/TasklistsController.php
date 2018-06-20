@@ -14,14 +14,18 @@ class TasklistsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-          $tasklists = Tasklist::all();
-
-        return view('tasklists.index', [
-            'tasklists' => $tasklists,
-        ]);
+  {
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $tasklists = $user->tasklists()->orderBy('created_at', 'desc')->paginate(10);
+            
+             return view('tasklists.index',[
+                 'tasklists' => $tasklists,
+                 ]);
+        }else {
+            return view('welcome');
+        }
     }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -50,6 +54,7 @@ class TasklistsController extends Controller
         ]);   
         
         $tasklist = new Tasklist;
+        $tasklist->user_id = \Auth::user()->id;
         $tasklist->status = $request->status;
         $tasklist->content = $request->content;
         $tasklist->save();
@@ -65,11 +70,14 @@ class TasklistsController extends Controller
      */
     public function show($id)
     {
-          $tasklist = Tasklist::find($id);
-
-        return view('tasklists.show', [
-            'tasklist' => $tasklist,
-        ]);
+        $tasklist = Tasklist::find($id);
+        
+        if(\Auth::user()->id == $tasklist->user_id){
+            return view('tasklists.show', [
+                'tasklist' => $tasklist,
+            ]);}else{
+            return redirect('/');
+        }
     }
 
     /**
@@ -80,11 +88,15 @@ class TasklistsController extends Controller
      */
     public function edit($id)
     {
-     $tasklist = Tasklist::find($id);
-
+        $tasklist = Tasklist::find($id);
+        if(\Auth::user()->id == $tasklist->user_id){
         return view('tasklists.edit', [
             'tasklist' => $tasklist,
-        ]);
+            ]);
+        }else{
+            return redirect('/');
+        }
+        
     }
 
     /**
